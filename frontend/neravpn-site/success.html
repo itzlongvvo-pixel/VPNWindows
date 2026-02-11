@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Activated | Nera VPN</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+
+    <div class="terminal-card" style="text-align: center; max-width: 500px;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+        
+        <h1 style="color: #fff; margin-bottom: 1rem;">System Activated</h1>
+        
+        <p style="color: #8b949e; margin-bottom: 2rem;">
+            Your anonymous channel is open. <br>
+            <strong>Save this ID.</strong> It is your only login credential.
+        </p>
+
+        <div id="finalCode" class="code-display" style="display: block; font-size: 1.5rem; color: #00ff88; border-color: #00ff88;">
+            LOADING...
+        </div>
+
+        <button class="btn-neon" onclick="copyToClipboard()">
+            Copy ID to Clipboard
+        </button>
+        
+        <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+            <p style="font-size: 0.9rem; color: #8b949e;">
+                Next Step: Download the app and paste this code.
+            </p>
+            <a href="/" style="color: #00d4ff; text-decoration: none; font-weight: 600;">Return Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve the code from LocalStorage (saved during Step 1)
+        // OR from URL params if we decide to pass it back later
+        const code = localStorage.getItem('nera_pending_code') || "ERROR: NO CODE FOUND";
+        document.getElementById('finalCode').innerText = code;
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(code);
+            const btn = document.querySelector('.btn-neon');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "COPIED!";
+            btn.style.background = "#fff"; // Flash white
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = ""; // Reset gradient
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

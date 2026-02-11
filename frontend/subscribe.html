@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nera VPN | Privacy is Code.</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Essential styles in case styles.css fails to load */
+        .code-display {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+            /* Hidden by default */
+            word-break: break-all;
+            border: 1px dashed #30363d;
+            color: #fff;
+        }
+
+        .success-mode {
+            border-color: #00ff88;
+            color: #00ff88;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <header class="site-header">
+            <nav class="nav">
+                <a href="/" class="brand">
+                    <img src="logo.svg" alt="Nera" class="brand-logo" onerror="this.style.display='none'">
+                    Nera VPN
+                </a>
+                <div class="nav-links">
+                    <a href="account.html"
+                        style="color: #00ff88; border: 1px solid rgba(0,255,136,0.3); padding: 0.5rem 1.2rem; border-radius: 8px; transition: all 0.2s;">Log
+                        In</a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="hero">
+            <div class="hero-content">
+                <h1
+                    style="font-size: 3.5rem; line-height: 1.1; font-weight: 800; margin-bottom: 1.5rem; color: #cbd5e1;">
+                    Anonymous Access.<br>
+                    <span>Instantly.</span>
+                </h1>
+                <p style="font-size: 1.2rem; color: #8b949e; margin-bottom: 3rem; max-width: 480px;">
+                    No email. No passwords. No logs.<br>
+                    Generate an anonymous ID, pay with crypto or cash, and vanish.
+                </p>
+
+
+            </div>
+
+            <div class="terminal-card">
+                <div
+                    style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+                    <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #00ff88;">///
+                        SECURE_CHANNEL_ESTABLISHED</span>
+                </div>
+
+                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 2rem;">
+                    <span style="font-size: 3rem; font-weight: 800; color: #fff;">$4.99</span>
+                    <span style="color: #8b949e;">/ month</span>
+                </div>
+
+                <ul style="list-style: none; padding: 0; margin-bottom: 2rem; color: #e6edf3;">
+                    <li style="margin-bottom: 0.8rem;">✓ <strong>Identity-Less</strong> Account</li>
+                    <li style="margin-bottom: 0.8rem;">✓ <strong>WireGuard®</strong> Protocol</li>
+                    <li style="margin-bottom: 0.8rem;">✓ <strong>5</strong> Devices</li>
+                </ul>
+
+                <div id="codeArea" class="code-display"></div>
+
+                <button id="mainBtn" class="btn-neon" onclick="handleAction()">
+                    Generate Anonymous ID
+                </button>
+
+                <div id="statusMsg" class="status-msg" style="margin-top: 1rem; font-size: 0.9rem; color: #8b949e;">
+                </div>
+
+                <div
+                    style="display: flex; gap: 3rem; justify-content: center; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                    <div style="text-align: center;">
+                        <h3 style="margin:0; font-size: 1.5rem; color: #fff; font-family: 'JetBrains Mono';">Zero</h3>
+                        <span style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Data
+                            Collected</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3 style="margin:0; font-size: 1.5rem; color: #fff; font-family: 'JetBrains Mono';">∞</h3>
+                        <span style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Bandwidth</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ✅ 1. CONFIGURATION
+        const API_URL = 'https://api.neravpn.com';
+
+        let currentState = 'GENERATE';
+        let accountCode = '';
+
+        const btn = document.getElementById('mainBtn');
+        const codeArea = document.getElementById('codeArea');
+        const statusMsg = document.getElementById('statusMsg');
+
+        // ✅ 2. MAIN LOGIC (Generate -> Pay)
+        async function handleAction() {
+            if (currentState === 'GENERATE') {
+                await generateCode();
+            } else if (currentState === 'SUBSCRIBE') {
+                await subscribe();
+            }
+        }
+
+        async function generateCode() {
+            setLoading(true, "ENCRYPTING NEW IDENTITY...");
+
+            try {
+                // Call Tokyo Server
+                const res = await fetch(`${API_URL}/api/subscription/generate`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.code) {
+                    accountCode = data.code;
+
+                    // Show Code
+                    currentState = 'SUBSCRIBE';
+                    codeArea.innerText = accountCode;
+                    codeArea.style.display = 'block';
+
+                    // Update Button
+                    btn.innerText = "ACTIVATE ($4.99)";
+                    statusMsg.style.color = '#00ff88';
+                    statusMsg.innerText = "ID Generated. Waiting for payment activation.";
+
+                    // Save locally
+                    localStorage.setItem('nera_pending_code', accountCode);
+                }
+            } catch (e) {
+                console.error(e);
+                statusMsg.style.color = '#ff5555';
+                statusMsg.innerText = "CONNECTION FAILED: Check Server Status.";
+            } finally {
+                if (currentState === 'GENERATE') setLoading(false, "Generate Anonymous ID");
+                else btn.disabled = false;
+            }
+        }
+
+        async function subscribe() {
+            setLoading(true, "HANDSHAKE WITH STRIPE...");
+
+            try {
+                const res = await fetch(`${API_URL}/api/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accountCode: accountCode })
+                });
+
+                const data = await res.json();
+                if (data.url) {
+                    window.location.href = data.url; // Redirect to Stripe
+                }
+            } catch (e) {
+                statusMsg.innerText = "GATEWAY ERROR. TRY AGAIN.";
+                setLoading(false, "ACTIVATE ($4.99)");
+            }
+        }
+
+        function setLoading(isLoading, text) {
+            btn.disabled = isLoading;
+            btn.innerText = text;
+        }
+
+        // ✅ 3. SUCCESS LOGIC (Runs on Return from Stripe)
+        window.addEventListener('load', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const status = urlParams.get('status');
+
+            if (status === 'success' && code) {
+                // We are back!
+                accountCode = code;
+
+                // 1. Show Code in Green
+                codeArea.innerText = code;
+                codeArea.classList.add('success-mode'); // Turns text/border green
+                codeArea.style.display = 'block';
+
+                // 2. Hide the Button (They already paid!)
+                btn.style.display = 'none';
+
+                // 3. Show Success Message
+                statusMsg.innerText = "✅ Payment Successful! Account Active.";
+                statusMsg.style.color = "#00ff88";
+                statusMsg.style.fontWeight = "bold";
+
+                // 4. Save to storage
+                localStorage.setItem('nera_account_code', code);
+            }
+        });
+    </script>
+</body>
+
+</html>

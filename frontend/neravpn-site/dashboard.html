@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>imuVPN — Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .wrap{max-width:860px;margin:40px auto}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    label{display:block;margin:6px 0;color:#cbd5e1}
+    input,select{
+      width:100%;
+      background:#0b1226;
+      border:1px solid var(--stroke);
+      border-radius:10px;
+      padding:12px;
+      color:var(--ink);
+    }
+    .table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    .table tr{background:var(--card);border:1px solid var(--stroke)}
+    .table td{padding:12px 14px}
+    pre{white-space:pre-wrap;word-break:break-word;background:#0b1226;border:1px solid var(--stroke);padding:12px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <header class="container header">
+    <a class="brand" href="./index.html">
+      <img src="./logo.svg" width="140" height="36" alt="imuVPN logo" />
+    </a>
+    <nav class="nav">
+      <a href="./index.html">Home</a>
+      <a class="cta" href="./dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="container wrap">
+    <div class="card">
+      <h2>Account</h2>
+      <p class="muted">Token: <span id="tokenPreview">(none)</span></p>
+      <button class="cta ghost" id="btnLogout">Logout</button>
+    </div>
+
+    <section class="row" style="margin-top:18px">
+      <div class="card">
+        <h3>1) Sign up</h3>
+        <label>Email <input id="suEmail" type="email" placeholder="you@example.com"></label>
+        <label>Password <input id="suPass" type="password" placeholder="********"></label>
+        <button class="cta" id="btnSignup">Create account</button>
+        <p class="muted" id="suMsg"></p>
+      </div>
+
+      <div class="card">
+        <h3>2) Log in</h3>
+        <label>Email <input id="liEmail" type="email" placeholder="you@example.com"></label>
+        <label>Password <input id="liPass" type="password" placeholder="********"></label>
+        <button class="cta" id="btnLogin">Log in</button>
+        <p class="muted" id="liMsg"></p>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h3>3) Create WireGuard config</h3>
+      <div class="row">
+        <label>Device name <input id="devName" placeholder="iPhone 15 Pro"></label>
+        <label>Location
+          <select id="location">
+            <option value="sgp-1">Singapore 1</option>
+            <option value="us-la-2">Los Angeles 2</option>
+            <option value="de-fra-1">Frankfurt 1</option>
+            <option value="jp-tyo-1">Tokyo 1</option>
+          </select>
+        </label>
+      </div>
+      <button class="cta" id="btnCreate">Create config</button>
+      <p class="muted" id="createMsg"></p>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3>Your devices & configs</h3>
+        <button class="cta ghost" id="btnRefresh">Refresh</button>
+      </div>
+      <table class="table" id="cfgTable"></table>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <div class="links">
+      <a href="./index.html">Home</a>
+      <a href="./legal/privacy.html">Privacy</a>
+      <a href="./legal/terms.html">Terms</a>
+    </div>
+    <p class="muted">© <span id="year"></span> imuVPN</p>
+  </footer>
+
+  <script>
+    const $ = (s)=>document.querySelector(s);
+    const API_BASE = localStorage.getItem('API_BASE') || 'https://imuvpn.onrender.com';
+
+    function showYear(){
+      const y = document.getElementById('year');
+      if(y) y.textContent = new Date().getFullYear();
+    }
+    function showToken(){
+      const t = localStorage.getItem('TOKEN');
+      $('#tokenPreview').textContent = t ? t.slice(0,6)+'…'+t.slice(-4) : '(none)';
+    }
+
+    async function signup(){
+      const email = $('#suEmail').value.trim();
+      const password = $('#suPass').value;
+      const r = await fetch(`${API_BASE}/auth/signup`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email,password})
+      });
+      $('#suMsg').textContent = r.ok ? '✅ Account created' : '❌ ' + (await r.text());
+    }
+
+    async function login(){
+      const email = $('#liEmail').value.trim();
+      const password = $('#liPass').value;
+      const r = await fetch(`${API_BASE}/auth/login`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email,password})
+      });
+      if(!r.ok){
+        $('#liMsg').textContent = '❌ ' + (await r.text());
+        return;
+      }
+      const data = await r.json();
+      localStorage.setItem('TOKEN', data.token);
+      $('#liMsg').textContent = '✅ Logged in';
+      showToken();
+      listCfgs();
+    }
+
+    async function listCfgs(){
+      const token = localStorage.getItem('TOKEN');
+      const headers = token ? {'Authorization': token} : {};
+      const r = await fetch(`${API_BASE}/wireguard/configs`, { headers });
+      const tbl = $('#cfgTable');
+      if(!r.ok){
+        tbl.innerHTML = '<tr><td class="muted">No devices yet</td></tr>';
+        return;
+      }
+      const rows = await r.json();
+      if(!rows.length){
+        tbl.innerHTML = '<tr><td class="muted">No devices yet</td></tr>';
+        return;
+      }
+      tbl.innerHTML = '';
+      rows.forEach((row,i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${i+1}</td>
+          <td>
+            <strong>${row.name}</strong><br>
+            <span class="muted">${row.location}</span>
+          </td>
+          <td>
+            <button class="cta ghost" data-i="${i}" data-a="copy">Copy</button>
+            <button class="cta ghost" data-i="${i}" data-a="dl">Download .conf</button>
+          </td>
+        `;
+        tbl.appendChild(tr);
+      });
+      tbl.onclick = async (e)=>{
+        const btn = e.target.closest('button');
+        if(!btn) return;
+        const idx = +btn.dataset.i;
+        const a = btn.dataset.a;
+        const token = localStorage.getItem('TOKEN');
+        const headers = token ? {'Authorization': token} : {};
+        const res = await fetch(`${API_BASE}/wireguard/configs`, { headers });
+        const rows = await res.json();
+        const cfg = rows[idx].config;
+        if(a === 'copy'){
+          await navigator.clipboard.writeText(cfg);
+          alert('Copied config to clipboard');
+        }else{
+          const blob = new Blob([cfg], {type:'text/plain'});
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = rows[idx].name.replace(/\s+/g,'_') + '.conf';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        }
+      };
+    }
+
+    async function createCfg(){
+      const token = localStorage.getItem('TOKEN');
+      if(!token){
+        $('#createMsg').textContent = '❌ Log in first';
+        return;
+      }
+      const headers = {
+        'Content-Type':'application/json',
+        'Authorization': token,
+      };
+      const body = JSON.stringify({
+        device_name: $('#devName').value.trim() || 'My device',
+        location: $('#location').value
+      });
+      const r = await fetch(`${API_BASE}/wireguard/configs`, {
+        method:'POST',
+        headers,
+        body
+      });
+      $('#createMsg').textContent = r.ok ? '✅ Config created' : '❌ ' + (await r.text());
+      if(r.ok) listCfgs();
+    }
+
+    function logout(){
+      localStorage.removeItem('TOKEN');
+      showToken();
+      listCfgs();
+      alert('Logged out');
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      showYear();
+      showToken();
+      listCfgs();
+      $('#btnSignup').onclick = signup;
+      $('#btnLogin').onclick = login;
+      $('#btnRefresh').onclick = listCfgs;
+      $('#btnCreate').onclick = createCfg;
+      $('#btnLogout').onclick = logout;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+Nera VPN™ End User License Agreement (EULA)
+Copyright © 2025 Vio Holdings LLC. All rights reserved.
+
+Grant of License
+This software ("Nera VPN™") is licensed, not sold. Vio Holdings LLC grants you a limited, non-exclusive, non-transferable license to use Nera VPN™ for personal or internal business purposes.
+Restrictions
+You may not:
+
+
+Copy, modify, reverse engineer, decompile, or disassemble the software
+Distribute, sell, sublicense, or rent the software
+Remove or alter any copyright, trademark, or proprietary notices
+Use the software for unlawful purposes
+
+
+Ownership
+All title, ownership rights, and intellectual property rights in Nera VPN™ remain with Vio Holdings LLC.
+Trademarks
+"Nera VPN" and the Nera VPN logo are trademarks of Vio Holdings LLC. All other trademarks are property of their respective owners.
+No Warranty
+Nera VPN™ is provided "as is" without warranty of any kind, express or implied.
+Termination
+This license terminates automatically if you violate any term. Upon termination, you must destroy all copies of the software.
+
+By installing or using Nera VPN™, you agree to these terms.
+Contact: [longvo@protonmail.com

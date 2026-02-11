@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "projectName": "NeraVPN Split Tunneling Fix",
+  "description": "Fix route-based bypass so excluded apps show ISP IP",
+  "tasks": [
+    {
+      "id": "IP-TEST",
+      "title": "Fix IP Verification",
+      "description": "whatismyip.com shows VPN IP or fails to load. Log destination IPs + force DNS bypass",
+      "priority": "CRITICAL",
+      "status": "pending",
+      "filesToModify": [
+        "src-tauri/src/split_tunnel.rs"
+      ]
+    },
+    {
+      "id": "DNS-FIX", 
+      "title": "DNS Bypass",
+      "description": "Add routes for 1.1.1.1, 8.8.8.8 + Chrome DNS. Built-in curl ifconfig.me test",
+      "priority": "HIGH",
+      "status": "pending",
+      "dependencies": ["IP-TEST"],
+      "filesToModify": ["src-tauri/src/split_tunnel.rs"]
+    },
+    {
+      "id": "PROD",
+      "title": "Production Polish", 
+      "description": "%APPDATA% config + UI toggle + route count",
+      "priority": "MEDIUM",
+      "status": "pending",
+      "dependencies": ["DNS-FIX"],
+      "filesToModify": ["src-tauri/src/split_tunnel.rs", "src/lib.rs"]
+    }
+  ]
+}

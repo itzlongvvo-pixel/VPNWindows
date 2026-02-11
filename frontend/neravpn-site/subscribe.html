@@ -1,0 +1,30 @@
+<script>
+    // 🟢 NEW: Check for success status and code in URL
+    window.addEventListener('load', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const status = urlParams.get('status');
+
+        // Identify the elements (Make sure your IDs match!)
+        const codeBox = document.querySelector('.code-display') || document.getElementById('generated-code'); 
+        const statusText = document.querySelector('.status-text') || document.getElementById('status-message');
+
+        if (status === 'success' && code) {
+            // 1. Put the code in the box
+            if (codeBox) {
+                codeBox.innerText = code;
+                codeBox.style.color = "#00ff88"; // Neon Green
+                codeBox.style.borderColor = "#00ff88";
+            }
+            
+            // 2. Update the status text
+            if (statusText) {
+                statusText.innerText = "✅ Payment Successful! Account Active.";
+                statusText.style.color = "#00ff88";
+            }
+
+            // 3. (Optional) Auto-save to localStorage so they don't lose it
+            localStorage.setItem('nera_account_code', code);
+        }
+    });
+</script>

@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Database
+prisma/dev.db
+prisma/dev.db-journal
+
+# Keys (NEVER commit these!)
+keys/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

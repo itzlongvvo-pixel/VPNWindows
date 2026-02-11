@@ -1,0 +1,120 @@
+# ═══════════════════════════════════════════════════════════════
+# Nera VPN™ - Git Ignore Configuration
+# ═══════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────
+# SECURITY & SECRETS (CRITICAL - Never commit these!)
+# ─────────────────────────────────────────────────────────────────
+
+# Environment variables
+.env
+.env.*
+.env.local
+.env.production
+
+# WireGuard configuration files
+*.conf
+nera-token.conf
+nera-tokyo.conf
+
+# Cryptographic keys
+*.key
+*.pub
+server_pubkey.txt
+wg0_server.txt
+wg.zip
+*.pem
+*.p12
+*.pfx
+
+# Wallet/identity files
+wallet.json
+id.json
+
+# Server keys directory (contains RSA keys)
+server/keys/
+
+# Sensitive documentation
+OPS_MANUAL.md
+
+# ─────────────────────────────────────────────────────────────────
+# DEPENDENCIES
+# ─────────────────────────────────────────────────────────────────
+
+node_modules/
+
+# ─────────────────────────────────────────────────────────────────
+# BUILD ARTIFACTS
+# ─────────────────────────────────────────────────────────────────
+
+# Tauri / Rust
+src-tauri/target/
+target/
+
+# Frontend builds
+dist/
+build/
+.vite/
+
+# Tauri backups
+src-tauri/tauri.conf.json.bak
+
+# Package installers
+*.msi
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.pkg
+
+# ─────────────────────────────────────────────────────────────────
+# LOGS & SYSTEM FILES
+# ─────────────────────────────────────────────────────────────────
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+src-tauri/*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE/Editor
+.vscode/
+.idea/
+*.sublime-*
+
+# ─────────────────────────────────────────────────────────────────
+# DATABASE
+# ─────────────────────────────────────────────────────────────────
+
+# Prisma SQLite database (local dev only)
+server/prisma/*.db
+server/prisma/*.db-journal
+
+# ─────────────────────────────────────────────────────────────────
+# EXCEPTIONS - These WILL be tracked
+# ─────────────────────────────────────────────────────────────────
+
+# Maintenance scripts (explicitly tracked)
+!server/maintenance/
+!server/maintenance/**
+
+# Example/template files
+!.env.example
+
+# Ralph Loop
+.ralph/
+ralph.log
+
+# Project Memory
+HANDOVER.md

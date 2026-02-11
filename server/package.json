@@ -1,0 +1,27 @@
+{
+    "name": "nera-vpn-server",
+    "version": "1.0.0",
+    "description": "Nera VPN Backend - Blind Token Authentication Server",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "db:push": "prisma db push",
+        "db:studio": "prisma studio",
+        "db:seed": "node prisma/seed.js"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^4.18.2",
+        "node-rsa": "^1.1.1",
+        "node-ssh": "^13.2.1",
+        "stripe": "^14.0.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.0",
+        "prisma": "^5.0.0"
+    }
+}

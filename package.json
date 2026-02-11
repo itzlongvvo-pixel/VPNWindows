@@ -1,0 +1,32 @@
+{
+  "name": "nera-vpn",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri": "tauri",
+    "tauri-build": "tauri build",
+    "ralph": "python -m ralph_py_cli.cli run",
+    "ralph:plan": "python -m ralph_py_cli.cli plan"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@tauri-apps/cli": "^2.9.6",
+    "debug": "^4.3.7",
+    "svelte": "^4.2.19",
+    "vite": "^5.4.2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/plugin-dialog": "^2.4.2",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-shell": "^2.3.3",
+    "chart.js": "^4.5.1",
+    "d3-geo": "^3.1.1",
+    "globe.gl": "^2.45.0",
+    "svelte-chartjs": "^3.1.5",
+    "topojson-client": "^3.1.0"
+  }
+}

@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Subscription codes for blind token authentication
+model SubscriptionCode {
+  id              Int       @id @default(autoincrement())
+  code            String    @unique  // e.g. "NERA-7777-8888"
+  status          String    @default("PENDING")  // PENDING, ACTIVE, EXPIRED
+  isValid         Boolean   @default(true)
+  stripeSessionId String?   // Stripe checkout session ID for correlation
+  usedAt          DateTime? // When the code was redeemed for VPN access
+  expiresAt       DateTime? // Subscription expiration date
+  createdAt       DateTime  @default(now())
+}
+
+// Track issued tokens (for audit/revocation)
+model IssuedToken {
+  id            Int      @id @default(autoincrement())
+  tokenHash     String   @unique // Hash of the access token (for privacy)
+  subscriptionId Int?    // Reference to which code generated this
+  isRevoked     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}

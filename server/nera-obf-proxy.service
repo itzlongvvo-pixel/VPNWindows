@@ -1,0 +1,10 @@
+[Unit]
+Description=Nera Obfuscation Proxy
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /root/obfuscation-proxy.js
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

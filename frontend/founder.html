@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>imuVPN — Founder Control Panel</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .founder-header {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      opacity: 0.8;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+    .card-metric h3 {
+      margin-bottom: 0.3rem;
+    }
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .metric-sub {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    .danger {
+      color: #ff6b81;
+    }
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .input-row input {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(8,8,12,0.7);
+      color: inherit;
+    }
+    .input-row button {
+      cursor: pointer;
+    }
+    .muted-small {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <header class="container header">
+    <a class="brand" href="./index.html">
+      <img src="./logo.svg" width="140" height="36" alt="imuVPN logo" />
+    </a>
+    <nav class="nav">
+      <a href="./index.html">Site</a>
+      <a href="./dashboard.html">Dashboard</a>
+      <a class="cta" href="./founder.html">Founder</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="founder-header">
+      <div>
+        <div class="tag">Founder · Internal only</div>
+        <h1>imuVPN Founder’s Control Panel</h1>
+        <p class="muted">
+          Quick pulse on users, sessions, and devices. Backed by your FastAPI backend.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="input-row">
+        <input
+          id="adminKeyInput"
+          type="password"
+          placeholder="Enter founder API key (kept in this browser only)"
+        />
+        <button class="cta" id="saveKeyBtn">Save key & load stats</button>
+      </div>
+      <p class="muted-small">
+        This key must match <code>FOUNDER_API_KEY</code> in Render. It is stored in
+        <code>localStorage</code> on this device only.
+      </p>
+    </section>
+
+    <section class="cards" id="metrics">
+      <div class="card card-metric">
+        <h3>Total users</h3>
+        <div class="metric-value" id="metricUsers">-</div>
+        <div class="metric-sub">All accounts that have signed up.</div>
+      </div>
+
+      <div class="card card-metric">
+        <h3>Active sessions</h3>
+        <div class="metric-value" id="metricSessions">-</div>
+        <div class="metric-sub">Currently logged in via API token.</div>
+      </div>
+
+      <div class="card card-metric">
+        <h3>VPN devices</h3>
+        <div class="metric-value" id="metricDevices">-</div>
+        <div class="metric-sub">WireGuard configs created across all users.</div>
+      </div>
+    </section>
+
+    <section style="margin-top:2rem;">
+      <h2>Notes</h2>
+      <ul class="bullets">
+        <li>Counts reset when the backend restarts (in-memory store).</li>
+        <li>Later we’ll plug this into a real database + Stripe subscription data.</li>
+        <li>Use this to sanity check growth while you’re still iterating.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = 'https://imuvpn.onrender.com';
+
+    function loadStoredKey() {
+      const stored = localStorage.getItem('FOUNDER_API_KEY');
+      if (stored) {
+        const input = document.getElementById('adminKeyInput');
+        input.value = stored;
+      }
+    }
+
+    async function fetchMetrics() {
+      const key = document.getElementById('adminKeyInput').value.trim();
+      if (!key) {
+        alert('Enter your founder API key first.');
+        return;
+      }
+
+      localStorage.setItem('FOUNDER_API_KEY', key);
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/overview`, {
+          headers: {
+            'X-Admin-Key': key
+          }
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('Admin error:', text);
+          alert('Failed to load stats. Check your founder key and try again.');
+          return;
+        }
+
+        const data = await res.json();
+        document.getElementById('metricUsers').textContent = data.total_users ?? 0;
+        document.getElementById('metricSessions').textContent = data.active_sessions ?? 0;
+        document.getElementById('metricDevices').textContent = data.total_devices ?? 0;
+      } catch (err) {
+        console.error(err);
+        alert('Network error talking to imuVPN API.');
+      }
+    }
+
+    document.getElementById('saveKeyBtn').addEventListener('click', fetchMetrics);
+
+    // Pre-fill from localStorage on load
+    loadStoredKey();
+  </script>
+</body>
+</html>

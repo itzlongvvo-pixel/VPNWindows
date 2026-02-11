@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Account | Nera VPN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Specific Styles for Account Dashboard */
+        .account-container { max-width: 600px; margin: 6rem auto; padding: 0 1.5rem; }
+        
+        /* The "Login" Input */
+        .login-box { text-align: center; animation: fadeIn 0.5s ease; }
+        .code-input {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 2rem 0;
+            outline: none;
+            letter-spacing: 2px;
+            transition: border-color 0.2s;
+        }
+        .code-input:focus { border-color: #00d4ff; }
+        .code-input::placeholder { color: #484f58; letter-spacing: normal; }
+
+        /* The Dashboard (Hidden initially) */
+        .dashboard-box { display: none; background: rgba(22, 27, 34, 0.8); border: 1px solid rgba(240, 246, 252, 0.1); border-radius: 24px; padding: 2.5rem; }
+        
+        .status-badge { display: inline-block; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .status-expired { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        .time-remaining { font-size: 3.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.5rem; }
+        .time-label { color: #8b949e; font-size: 1.1rem; margin-bottom: 2.5rem; }
+
+        .topup-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+        .topup-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .topup-card:hover { background: rgba(255,255,255,0.08); border-color: #00d4ff; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <nav style="padding: 2rem;">
+        <div class="page" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="/" class="brand">
+                <img src="nera-vpn-logo.svg" class="brand-logo" style="width: 40px;">
+                Nera VPN
+            </a>
+            <a href="/" style="color: #8b949e; text-decoration: none;">&larr; Back home</a>
+        </div>
+    </nav>
+
+    <div class="account-container">
+        
+        <div id="loginSection" class="login-box">
+            <h1>Access Portal</h1>
+            <p style="color: #8b949e; margin-top: 0.5rem;">Enter your 16-digit Account ID</p>
+            
+            <input type="text" id="codeInput" class="code-input" placeholder="xxxx-xxxx-xxxx-xxxx" autocomplete="on" name="nera-account-id">
+            
+            <button class="btn-neon" onclick="checkAccount()">Access Dashboard</button>
+            <p id="loginMsg" style="margin-top: 1rem; color: #ef4444; min-height: 1.5em;"></p>
+        </div>
+
+        <div id="dashboardSection" class="dashboard-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-family: 'JetBrains Mono'; color: #8b949e;" id="displayCode"></span>
+                <div id="statusBadge" class="status-badge status-active">ACTIVE</div>
+            </div>
+
+            <div style="text-align: center; margin: 3rem 0;">
+                <div class="time-remaining" id="daysLeft">--</div>
+                <div class="time-label">Days Remaining</div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Add Time</h3>
+                <div class="topup-options">
+                    <div class="topup-card" onclick="topUp('month')">
+                        <div style="font-weight: 700; font-size: 1.2rem; color: #fff;">+30 Days</div>
+                        <div style="color: #00ff88; margin-top: 0.5rem;">$4.99</div>
+                    </div>
+                    <div class="topup-card" onclick="topUp('year')">
+                        <div style="font-weight: 700; font-size: 1.2rem; color: #fff;">+1 Year</div>
+                        <div style="color: #00ff88; margin-top: 0.5rem;">$49.99</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; text-align: center;">
+                <button onclick="logout()" style="background: none; border: none; color: #8b949e; text-decoration: underline; cursor: pointer;">Exit Portal</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = 'https://api.neravpn.com'; // Change to your VPS IP
+        let currentCode = '';
+
+        // Auto-fill from local storage if available
+        window.onload = () => {
+            const saved = localStorage.getItem('nera_pending_code'); // Or app storage
+            if(saved) document.getElementById('codeInput').value = saved;
+        };
+
+        async function checkAccount() {
+            const code = document.getElementById('codeInput').value.trim();
+            if(code.length < 5) return;
+
+            const btn = document.querySelector('.btn-neon');
+            const msg = document.getElementById('loginMsg');
+            
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
+            msg.innerText = "";
+
+            try {
+                // Fetch Account Info from Tokyo
+                const res = await fetch(`${API_URL}/api/account/${code}`);
+                const data = await res.json();
+
+                if(res.ok && data.active !== undefined) {
+                    showDashboard(data, code);
+                } else {
+                    msg.innerText = "Account not found or expired.";
+                }
+            } catch(e) {
+                console.error(e);
+                msg.innerText = "Connection Error. Is the server online?";
+            } finally {
+                btn.innerText = "Access Dashboard";
+                btn.disabled = false;
+            }
+        }
+
+        function showDashboard(data, code) {
+            currentCode = code;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            document.getElementById('displayCode').innerText = code;
+            document.getElementById('daysLeft').innerText = data.daysRemaining;
+            
+            const badge = document.getElementById('statusBadge');
+            if(data.daysRemaining > 0) {
+                badge.className = 'status-badge status-active';
+                badge.innerText = 'ACTIVE';
+            } else {
+                badge.className = 'status-badge status-expired';
+                badge.innerText = 'EXPIRED';
+            }
+        }
+
+        async function topUp(plan) {
+            // Call API to create Stripe Checkout for Top-Up
+            // Note: This needs a new backend endpoint
+            try {
+                const res = await fetch(`${API_URL}/api/create-topup-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accountCode: currentCode, plan: plan })
+                });
+                const data = await res.json();
+                if(data.url) window.location.href = data.url;
+            } catch(e) {
+                alert("Payment gateway error");
+            }
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
