@@ -1,0 +1,370 @@
+﻿cargo :     Checking app 
+v0.1.0 (C:\Users\longv\dev\
+nera-vpn-desktop\src-tauri)
+At line:1 char:1
++ cargo check > 
+build_log.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo         
+     : NotS    pecified: ( 
+       Checking ap...k    
+top\src-tauri):    String) 
+[], Rem    oteException
+    + FullyQualifie    
+dErrorId : Nati    
+veCommandError
+ 
+error[E0432]: unresolved 
+import `tauri::Icon`
+  --> src\main.rs:35:16
+   |
+35 |     AppHandle, Icon, 
+Manager, State,
+   |                ^^^^ 
+no `Icon` in the root
+   |
+   = help: consider 
+importing this variant 
+instead:
+           tauri::menu::Men
+uItemKind::Icon
+
+warning: unused imports: 
+`CheckMenuItem` and 
+`MouseButtonState`
+  --> src\main.rs:33:41
+   |
+33 |     menu::{Menu, 
+MenuItem, MenuBuilder, 
+CheckMenuItem},
+   |                       
+                  
+^^^^^^^^^^^^^
+34 |     
+tray::{TrayIconBuilder, 
+TrayIconEvent, 
+MouseButton, 
+MouseButtonState},
+   |                       
+                           
+       ^^^^^^^^^^^^^^^^
+   |
+   = note: 
+`#[warn(unused_imports)]` 
+(part of 
+`#[warn(unused)]`) on by 
+default
+
+warning: unused import: `ta
+uri_plugin_shell::ShellExt`
+  --> src\main.rs:39:5
+   |
+39 | use tauri_plugin_shell
+::ShellExt;
+   |     ^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
+
+warning: unused variable: 
+`app`
+   --> src\main.rs:637:40
+    |
+637 | async fn import_wireg
+uard_config_async(app: 
+AppHandle) -> 
+Result<String, String> {
+    |                      
+                  ^^^ 
+help: if this is 
+intentional, prefix it 
+with an underscore: `_app`
+    |
+    = note: `#[warn(unused_
+variables)]` (part of 
+`#[warn(unused)]`) on by 
+default
+
+warning: unused variable: 
+`dest_path`
+   --> src\main.rs:638:10
+    |
+638 |      let dest_path = 
+nera_conf_path().map_err(|e
+| e.to_string())?;
+    |          ^^^^^^^^^ 
+help: if this is 
+intentional, prefix it 
+with an underscore: 
+`_dest_path`
+
+error[E0599]: no method 
+named `emit_all` found for 
+reference `&AppHandle` in 
+the current scope
+   --> src\main.rs:443:10
+    |
+442 | /     app_handle
+443 | |         .emit_all("
+vpn-status-changed", 
+VpnStatusPayload { 
+connected: true })
+    | |_________-^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+443 -         .emit_all("vp
+n-status-changed", 
+VpnStatusPayload { 
+connected: true })
+443 +         .emit("vpn-st
+atus-changed", 
+VpnStatusPayload { 
+connected: true })
+    |
+
+error[E0599]: no method 
+named `emit_all` found for 
+struct `AppHandle<R>` in 
+the current scope
+   --> src\main.rs:508:22
+    |
+507 | /                 
+app_handle_clone
+508 | |                    
+ .emit_all(
+    | |____________________
+_-^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+508 -                     
+.emit_all(
+508 +                     
+.emit(
+    |
+
+error[E0599]: no method 
+named `emit_all` found for 
+reference `&AppHandle` in 
+the current scope
+   --> src\main.rs:566:18
+    |
+565 | /             
+app_handle
+566 | |                 .em
+it_all("vpn-status-changed"
+, VpnStatusPayload { 
+connected: false })
+    | 
+|_________________-^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+566 -                 .emit
+_all("vpn-status-changed", 
+VpnStatusPayload { 
+connected: false })
+566 +                 .emit
+("vpn-status-changed", 
+VpnStatusPayload { 
+connected: false })
+    |
+
+error[E0599]: no method 
+named `emit_all` found for 
+reference `&AppHandle` in 
+the current scope
+   --> src\main.rs:580:10
+    |
+579 | /     app_handle
+580 | |         .emit_all("
+vpn-status-changed", 
+VpnStatusPayload { 
+connected: false })
+    | |_________-^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+580 -         .emit_all("vp
+n-status-changed", 
+VpnStatusPayload { 
+connected: false })
+580 +         .emit("vpn-st
+atus-changed", 
+VpnStatusPayload { 
+connected: false })
+    |
+
+error[E0599]: no method 
+named `emit_all` found for 
+struct `AppHandle<R>` in 
+the current scope
+   --> src\main.rs:699:9
+    |
+699 |     app.emit_all("kil
+l-switch-changed", 
+KillSwitchPayload { 
+enabled })
+    |         ^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+699 -     app.emit_all("kil
+l-switch-changed", 
+KillSwitchPayload { 
+enabled })
+699 +     app.emit("kill-sw
+itch-changed", 
+KillSwitchPayload { 
+enabled })
+    |
+
+error[E0425]: cannot find 
+function `build_tray` in 
+this scope
+   --> src\main.rs:802:23
+    |
+802 |     let system_tray 
+= build_tray();
+    |                      
+ ^^^^^^^^^^ not found in 
+this scope
+
+error[E0433]: failed to 
+resolve: use of unresolved 
+module or unlinked crate 
+`tauri_plugin_process`
+   --> src\main.rs:828:17
+    |
+828 |         .plugin(tauri
+_plugin_process::init())
+    |                 
+^^^^^^^^^^^^^^^^^^^^ use 
+of unresolved module or 
+unlinked crate 
+`tauri_plugin_process`
+    |
+help: there is a crate or 
+module with a similar name
+    |
+828 -         .plugin(tauri
+_plugin_process::init())
+828 +         .plugin(tauri
+_plugin_shell::init())
+    |
+
+error[E0599]: no method 
+named `emit_all` found for 
+reference `&AppHandle` in 
+the current scope
+   --> src\main.rs:888:41
+    |
+888 | ...                  
+ let _ = app.emit_all(
+    |                      
+         ----^^^^^^^^
+    |
+help: there is a method 
+`emit` with a similar name
+    |
+888 -                      
+       let _ = 
+app.emit_all(
+888 +                      
+       let _ = app.emit(
+    |
+
+error[E0599]: no method 
+named `get_window` found 
+for reference `&AppHandle` 
+in the current scope
+   --> src\main.rs:894:55
+    |
+894 | ...                  
+ if let Some(window) = 
+app.get_window("main") {
+    |                      
+                           
+^^^^^^^^^^
+    |
+help: there is a method 
+`get_webview_window` with 
+a similar name
+    |
+894 |                      
+       if let Some(window) 
+= app.get_webview_window("m
+ain") {
+    |                      
+                           
+           ++++++++
+
+error[E0599]: no method 
+named `get_window` found 
+for reference `&AppHandle` 
+in the current scope
+   --> src\main.rs:909:65
+    |
+909 |                      
+   if let Some(window) = tr
+ay.app_handle().get_window(
+"main") {
+    |                      
+                           
+                ^^^^^^^^^^
+    |
+help: there is a method 
+`get_webview_window` with 
+a similar name
+    |
+909 |                      
+   if let Some(window) = tr
+ay.app_handle().get_webview
+_window("main") {
+    |                      
+                           
+                     
+++++++++
+
+warning: unused variable: 
+`dest_path`
+   --> src\main.rs:619:9
+    |
+619 |     let dest_path = 
+nera_conf_path()?;
+    |         ^^^^^^^^^ 
+help: if this is 
+intentional, prefix it 
+with an underscore: 
+`_dest_path`
+
+warning: unused variable: 
+`file_path`
+   --> src\main.rs:621:9
+    |
+621 |     let file_path = a
+pp.dialog().file().blocking
+_pick_file();
+    |         ^^^^^^^^^ 
+help: if this is 
+intentional, prefix it 
+with an underscore: 
+`_file_path`
+
+Some errors have detailed 
+explanations: E0425, 
+E0432, E0433, E0599.
+For more information about 
+an error, try `rustc 
+--explain E0425`.
+warning: `app` (bin "app") 
+generated 6 warnings
+error: could not compile 
+`app` (bin "app") due to 
+11 previous errors; 6 
+warnings emitted

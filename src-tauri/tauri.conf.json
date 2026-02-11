@@ -1,0 +1,42 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+  "bundle": {
+    "active": true,
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "targets": "all"
+  },
+  "productName": "Nera VPN™",
+  "mainBinaryName": "Nera VPN™",
+  "version": "0.1.0",
+  "identifier": "com.neravpn.app",
+  "plugins": {},
+  "app": {
+    "windows": [
+      {
+        "title": "Nera VPN™",
+        "width": 1120,
+        "height": 680,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": false,
+        "theme": "Dark",
+        "useHttpsScheme": true
+      }
+    ],
+    "security": {
+      "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.ico",
+      "iconAsTemplate": false
+    }
+  }
+}
